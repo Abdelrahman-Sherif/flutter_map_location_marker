@@ -30,11 +30,15 @@ class LocationMarkerPlugin implements MapPlugin {
   /// The duration of the animation of centering the current location.
   final Duration centerAnimationDuration;
 
+  /// The boundaries that the location should not exceed
+  final LatLngBounds? latLngBounds;
+
   const LocationMarkerPlugin({
     this.locationOptions = const LocationOptions(),
     this.centerCurrentLocationStream,
     this.centerOnLocationUpdate = CenterOnLocationUpdate.never,
     this.centerAnimationDuration = const Duration(milliseconds: 500),
+    this.latLngBounds,
   });
 
   @override
@@ -178,7 +182,10 @@ class _LocationMarkerLayerState extends State<LocationMarkerLayer>
           centerCurrentLocation = false;
           break;
       }
-      if (centerCurrentLocation) {
+      if (centerCurrentLocation &&
+          (widget.plugin.latLngBounds == null ||
+              (widget.plugin.latLngBounds!
+                  .contains(LatLng(position.latitude, position.longitude))))) {
         _moveMap(
             LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
             widget.map.zoom);
